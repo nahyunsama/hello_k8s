@@ -1,4 +1,4 @@
-# 00. podinfo를 YAML로 직접 배포하기
+# 01. podinfo를 YAML로 직접 배포하기
 
 > 이 문서를 보면서 YAML 파일 3개를 **직접 타이핑**하고, `kubectl apply`로 배포해 본다.
 > 복사해서 붙여넣지 말고 손으로 쳐보는 걸 추천. 오타를 고치는 과정도 공부가 된다.
@@ -10,10 +10,11 @@
 ### 최종 목표 구조
 ```
 00_podinfo/
-├── guideline.md      ← 지금 보고 있는 문서
-├── namespace.yaml    ← Step 1에서 작성
-├── deployment.yaml   ← Step 2에서 작성
-└── service.yaml      ← Step 3에서 작성
+├── namespace.yaml        ← Step 1에서 작성 (모든 실습 공용)
+└── 01-basic-deploy/
+    ├── guideline.md      ← 지금 보고 있는 문서
+    ├── deployment.yaml   ← Step 2에서 작성
+    └── service.yaml      ← Step 3에서 작성
 ```
 
 ### 그림으로 보면
@@ -50,7 +51,7 @@ kubectl get ns
 
 ## Step 1. Namespace 만들기
 
-📄 `namespace.yaml`
+📄 `00_podinfo/namespace.yaml` (이 파일만 상위 폴더에 둔다)
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -60,11 +61,14 @@ metadata:
 
 **왜 나누나?** 실습 리소스를 한 곳에 모아두면 `kubectl delete ns lab` 한 번으로 전부 정리할 수 있다. 시스템 리소스(`kube-system`)와 섞이지도 않는다.
 
+**왜 상위 폴더에?** 모든 podinfo 실습(01, 02, ...)이 같은 `lab` 네임스페이스를 쓴다. 실습 폴더에서 `kubectl delete -f .`을 해도 네임스페이스는 남아서 다음 실습으로 바로 넘어갈 수 있다.
+
 ### 적용 & 확인
 ```powershell
 cd C:\Users\hamna\Documents\hello_k8s\00_podinfo
 kubectl apply -f namespace.yaml
 kubectl get ns
+cd 01-basic-deploy     # 이후 Step은 이 폴더에서 진행
 ```
 ✅ 예상 결과
 ```
@@ -303,8 +307,8 @@ kubectl logs <이름> -n lab              # 앱 로그 보기
 
 ## 🧹 정리
 ```powershell
-kubectl delete -f .
-# 또는
+kubectl delete -f .        # 이 실습의 리소스만 삭제 (lab 네임스페이스는 유지)
+# 전부 지우고 싶다면
 kubectl delete ns lab
 ```
 
@@ -323,6 +327,4 @@ kubectl delete ns lab
 - [ ] 망가뜨리고 고치기 + ❓ 질문 답해보기
 
 ## 다음 단계
-- liveness/readiness probe 추가하기
-- HPA 오토스케일링 (`minikube addons enable metrics-server`)
-- 같은 앱을 Helm으로 배포해서 비교하기
+➡️ [02-probes](../02-probes/guideline.md): readiness/liveness/startup probe로 "고장 난 버전이 배포되는 것" 막기
